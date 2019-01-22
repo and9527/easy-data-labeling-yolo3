@@ -1,6 +1,8 @@
 import cv2
 import csv
 import pathlib
+import keyboard
+import copy
 
 # initialize the list of reference points and boolean indicating
 # whether cropping is being performed or not
@@ -8,26 +10,30 @@ refPt = []
 cropping = False
 
 def click_and_crop(event, x, y, flags, param):
-	# grab references to the global variables
-	global refPt, cropping
+    # grab references to the global variables
+    global refPt, cropping
 
-	# if the left mouse button was clicked, record the starting
-	# (x, y) coordinates and indicate that cropping is being
-	# performed
-	if event == cv2.EVENT_LBUTTONDOWN:
-		refPt = [(x, y)]
-		cropping = True
+    # if the left mouse button was clicked, record the starting
+    # (x, y) coordinates and indicate that cropping is being
+    # performed
+    if event == cv2.EVENT_LBUTTONDOWN:
+        refPt = [(x, y)]
+        cropping = True
 
-	# check to see if the left mouse button was released
-	elif event == cv2.EVENT_LBUTTONUP:
-		# record the ending (x, y) coordinates and indicate that
-		# the cropping operation is finished
-		refPt.append((x, y))
-		cropping = False
+    # check to see if the left mouse button was released
+    elif event == cv2.EVENT_LBUTTONUP:
+        # record the ending (x, y) coordinates and indicate that
+        # the cropping operation is finished
+        refPt.append((x, y))
+        cropping = False
 
-		# draw a rectangle around the region of interest
-		cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
-		cv2.imshow("image", image)
+        # draw a rectangle around the region of interest
+        cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
+        cv2.imshow("image", image)
+        if flags == 0:
+            #keyboard.press_and_release ('c')
+            keyboard.press_and_release ('c')
+        keyboard.press_and_release ('c')
 
 FramePerImage = 10
 videoName = 'output.avi'
@@ -44,7 +50,7 @@ f = open(path + '/train.txt', 'w', encoding='utf-8')
 classes = open(path + '/classes.txt', 'w', encoding='utf-8')
 class_names = []
 
-
+class_name = input("Please enter a class: ")
 while(vidcap.isOpened()):
     ret, image = vidcap.read()
 
@@ -55,26 +61,31 @@ while(vidcap.isOpened()):
         print('Saved frame number : ' + str(int(vidcap.get(1))))
         cv2.imwrite(path + "/frame%d.jpg" % count, image)
         print('Saved frame%d.jpg' % count)
-        count += 1
+
 
         image = cv2.imread(path + "/frame%d.jpg" % count)
+        count += 1
+
+
         clone = image.copy()
         cv2.namedWindow("image")
         cv2.setMouseCallback("image", click_and_crop)
 
         # keep looping until the 'q' key is pressed
         while True:
-        	# display the image and wait for a keypress
-        	cv2.imshow("image", image)
-        	key = cv2.waitKey(1) & 0xFF
+            # display the image and wait for a keypress
+            cv2.imshow("image", image)
+            key = cv2.waitKey(1) & 0xFF
 
-        	# if the 'r' key is pressed, reset the cropping region
-        	if key == ord("r"):
-        		image = clone.copy()
+            # if the 'r' key is pressed, reset the cropping region
+            #if key == ord("r"):
+            #    image = clone.copy()
 
-        	# if the 'c' key is pressed, break from the loop
-        	elif key == ord("c"):
-        		break
+            # if the 'c' key is pressed, break from the loop
+            if key == ord("c"):
+            #
+
+                break
 
         # if there are two reference points, then crop the region of interest
         # from teh image and display it
@@ -96,7 +107,7 @@ while(vidcap.isOpened()):
             if x_max-x_min > 0 and y_max - y_min > 0:
                 roi = clone[x_min:x_max, y_min:y_max]
                 print(x_min, y_min, x_max, y_max)
-                class_name = input("Please enter a class: ")
+                #class_name = input("Please enter a class: ")
                 class_num = 0
                 if class_name not in class_names:
                     class_names.append(class_name)
