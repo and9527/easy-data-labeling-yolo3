@@ -2,6 +2,7 @@ import cv2
 import csv
 import pathlib
 import keyboard
+import time
 import copy
 
 # initialize the list of reference points and boolean indicating
@@ -33,9 +34,10 @@ def click_and_crop(event, x, y, flags, param):
         if flags == 0:
             #keyboard.press_and_release ('c')
             keyboard.press_and_release ('c')
+            #time.sleep (10)
         keyboard.press_and_release ('c')
 
-FramePerImage = 10
+FramePerImage = 1
 videoName = 'output.avi'
 path = videoName.split('.')[0]
 
